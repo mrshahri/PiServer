@@ -35,24 +35,28 @@ sys.setdefaultencoding('utf8')
 
 here = os.path.dirname(os.path.realpath(__file__))
 
-records = {"fname": "Tal", "lname": "Tal"}
+status = {"machine1": "ON", "machine2": "ON", "machine3": "OFF", "machine4": "ON"}
 
-def get_records(handler):
-    return records
+# GET all status
+def get_statuses(handler):
+    return status
 
-def get_record(handler):
+# GET one status
+def get_status(handler):
     key = urllib.unquote(handler.path[8:])
-    return records[key] if key in records else None
+    return status[key] if key in status else None
 
-def set_record(handler):
+# PUT one status
+def set_status(handler):
     key = urllib.unquote(handler.path[8:])
     payload = handler.get_payload()
-    records[key] = payload
-    return records[key]
+    status[key] = payload
+    # TODO Code of power switching of DL IoT Relay
+    return status[key]
 
-def delete_record(handler):
+def delete_status(handler):
     key = urllib.unquote(handler.path[8:])
-    del records[key]
+    del status[key]
     return True # anything except None shows success
 
 def rest_call_json(url, payload=None, with_payload_method='PUT'):
@@ -85,8 +89,8 @@ class RESTRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         self.routes = {
             r'^/$': {'file': 'web/index.html', 'media_type': 'text/html'},
-            r'^/records$': {'GET': get_records, 'media_type': 'application/json'},
-            r'^/record/': {'GET': get_record, 'PUT': set_record, 'DELETE': delete_record, 'media_type': 'application/json'}}
+            r'^/statuses$': {'GET': get_statuses, 'media_type': 'application/json'},
+            r'^/status/': {'GET': get_status, 'PUT': set_status, 'DELETE': delete_status, 'media_type': 'application/json'}}
         
         return BaseHTTPServer.BaseHTTPRequestHandler.__init__(self, *args, **kwargs)
     
@@ -108,7 +112,7 @@ class RESTRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     def get_payload(self):
         payload_len = int(self.headers.getheader('content-length', 0))
         payload = self.rfile.read(payload_len)
-        payload = json.loads(payload)
+        # payload = json.loads(payload)
         return payload
         
     def handle_method(self, method):
