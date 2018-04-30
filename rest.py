@@ -27,7 +27,7 @@ Create the file web/index.html if you'd like to test serving static files. It wi
 @author: Tal Liron (tliron @ github.com)
 '''
 
-import sys, os, re, shutil, json, urllib, urllib2, BaseHTTPServer, dlipower
+import sys, os, re, shutil, json, urllib, urllib2, BaseHTTPServer, RPi.GPIO as GPIO
 
 # Fix issues with decoding HTTP responses
 reload(sys)
@@ -36,6 +36,7 @@ sys.setdefaultencoding('utf8')
 here = os.path.dirname(os.path.realpath(__file__))
 
 status = {"machine1": "ON", "machine2": "ON", "machine3": "OFF", "machine4": "ON"}
+pins = {"machine1": 14, "machine2": 15, "machine3": 17, "machine4": 18}
 
 # GET all status
 def get_statuses(handler):
@@ -52,6 +53,10 @@ def set_status(handler):
     payload = handler.get_payload()
     status[key] = payload
     # TODO Code of power switching of DL IoT Relay
+    if payload == 'ON':
+	GPIO.output(pins[key],True)
+    else:
+	GPIO.output(pins[key],False)
     return status[key]
 
 def delete_status(handler):
@@ -186,6 +191,21 @@ def rest_server(port):
     http_server.server_close()
 
 def main(argv):
+    GPIO.setmode(GPIO.BCM)
+    # 8 in board
+    GPIO.setup(14,GPIO.OUT)
+    # 10 in board
+    GPIO.setup(15,GPIO.OUT)
+    # 11 in board
+    GPIO.setup(17,GPIO.OUT)
+    # 12 in board
+    GPIO.setup(18,GPIO.OUT)
+    for key,val in status.items():
+	if val == 'ON':
+	    GPIO.output(pins[key],True)
+	else:
+	    GPIO.output(pins[key],False)
+        
     rest_server(8080)
 
 if __name__ == '__main__':
