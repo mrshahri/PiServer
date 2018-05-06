@@ -35,8 +35,8 @@ sys.setdefaultencoding('utf8')
 
 here = os.path.dirname(os.path.realpath(__file__))
 
-status = {"bukito": "OFF", "xcarve": "OFF", "corexz": "OFF", "uarm": "OFF"}
-pins = {"bukito": 14, "xcarve": 15, "corexz": 17, "uarm": 18}
+status = {"ultimaker": "OFF", "xcarve": "OFF", "corexz": "OFF", "uarm": "OFF"}
+pins = {"ultimaker": 14, "xcarve": 15, "corexz": 17, "uarm": 18}
 
 # GET all status
 def get_statuses(handler):
